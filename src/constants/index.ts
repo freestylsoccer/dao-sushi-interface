@@ -346,5 +346,9 @@ export const PROJECT_BUSD: { [chainId in ChainId]?: string } = {
   [ChainId.BSC_TESTNET]: '0x75CC5922d9B577d23447a81F80767816115f5364',
 }
 
+export const BOND_DEPOSITORY_V2_ADDRESS: { [chainId in ChainId]?: string } = {
+  [ChainId.MATIC_TESTNET]: '0xeeF44e26A89Bf0BA4Fe0Ff4ac8de549ef44E7F9a',
+}
+
 export * from './routing'
 export * from './tokens'

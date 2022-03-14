@@ -73,6 +73,8 @@ import PROTOCOL_DATA_PROVIDER_ABI from '../constants/abis/ProtocolDataProvider.j
 import { LENDING_POOL_ADDRESS, PROTOCOL_DATA_PROVIDER_ADDRESS, UI_POOL_DATA_PROVIDER } from '../constants'
 import LENDING_POOL_ABI from '../constants/abis/LendingPool.json'
 import UI_POOL_DATA_PROVIDER_ABI from '../constants/abis/uipooldataprovider.json'
+import BOND_DEPOSITORY_V2_ABI from '../constants/abis/bond-depository-v2.json'
+import { BOND_DEPOSITORY_V2_ADDRESS } from '../constants'
 
 const UNI_FACTORY_ADDRESS = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'
 
@@ -660,4 +662,9 @@ export function useInariContract(withSignerIfPossible?: boolean): Contract | nul
 
 export function useZenkoContract(withSignerIfPossible?: boolean): Contract | null {
   return useContract('0xa8f676c49f91655ab3b7c3ea2b73bb3088b2bc1f', ZENKO_ABI, withSignerIfPossible)
+}
+
+export function useBondDepositoryContract(): Contract | null {
+  const { chainId } = useActiveWeb3React()
+  return useContract(chainId && BOND_DEPOSITORY_V2_ADDRESS[chainId], BOND_DEPOSITORY_V2_ABI, false)
 }

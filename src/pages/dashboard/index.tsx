@@ -10,6 +10,7 @@ import { useRouter } from 'next/router'
 import Provider from '../../features/lending/context'
 import DashboardList from '../../features/farm/DashboardList'
 import Button from '../../components/Button'
+import { useBondingState, useDerivedBondInfo } from '../../state/bonding/hooks'
 
 export default function Dashboard(): JSX.Element {
   const { account } = useActiveWeb3React()
@@ -19,7 +20,11 @@ export default function Dashboard(): JSX.Element {
   const borrowsType = router.query.filter == null ? 'borrows' : (router.query.filter as string)
 
   const { user: userReserves } = useProtocolDataWithRpc()
-  // console.log(userReserves);
+  // pending to configure useBondingState()
+
+  const liveBondIndexes = useDerivedBondInfo()
+  console.log(liveBondIndexes)
+
   // maybe the ptoken mint amount must be the real amount not the scaled amount
   // console.log(reservesData);
   // console.log(isUserHasDeposits);
@@ -44,7 +49,7 @@ export default function Dashboard(): JSX.Element {
   return (
     <Container
       id="farm-page"
-      className="grid h-full p-3 grid-cols-6 py-20 mx-auto md:py-24 lg:py-24 gap-9"
+      className="grid h-full grid-cols-6 p-3 py-20 mx-auto md:py-24 lg:py-24 gap-9"
       maxWidth="7xl"
     >
       <Head>
@@ -62,7 +67,7 @@ export default function Dashboard(): JSX.Element {
             <div className="flex items-center justify-center text-lg font-bold text-high-emphesis whitespace-nowrap">
               Please connect your wallet{' '}
             </div>
-            <div className="flex items-center justify-center text-md text-high-emphesis text-center">
+            <div className="flex items-center justify-center text-center text-md text-high-emphesis">
               To see your deposited / borrowed assets, you need to connect your wallet.{' '}
             </div>
             <div className="flex justify-center">

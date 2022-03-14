@@ -14,7 +14,7 @@ const DashboardListItem = ({ project, type, ...rest }) => {
   const underlyingAsset = useCurrency(project?.underlyingAsset)
   const router = useRouter()
   const interestEarned = BigNumber.from(project?.aTokenBalance).sub(BigNumber.from(project?.pTokenBalance))
-  // console.log(project)
+  console.log(project)
   return (
     <Disclosure {...rest}>
       {({ open }) => (
