@@ -219,7 +219,7 @@ export default function Bonds() {
                 </div>
 
                 <div className="flex items-center justify-between w-full mt-6">
-                  <div className="grid grid-cols-6 text-base font-bold text-primary">
+                  <div className="grid grid-cols-6 text-base font-bold text-primary space-y-4 w-full">
                     <div
                       className="flex items-center justify-center cursor-pointer hover:text-high-emphesis"
                       onClick={() => requestSort('displayName')}
@@ -234,7 +234,7 @@ export default function Bonds() {
                       className="flex items-center justify-center cursor-pointer hover:text-high-emphesis"
                       onClick={() => requestSort('displayName')}
                     >
-                      <div className="hover:text-high-emphesis">{i18n._(t`Bond`)}</div>
+                      {i18n._(t`Bond`)}
                       {sortConfig &&
                         sortConfig.key === 'displayName' &&
                         ((sortConfig.direction === 'ascending' && <ChevronUpIcon width={12} height={12} />) ||

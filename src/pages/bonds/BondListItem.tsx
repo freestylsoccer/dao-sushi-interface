@@ -25,20 +25,15 @@ const BondListItem = ({ bond, ...rest }) => {
 
   const modalHeader = () => {
     return (
-      <div className="pb-4">
-        <div className="flex items-center justify-start gap-3">
-          <div className="text-lg font-bold md:text-xl text-high-emphesis">{bond?.displayName}</div>
+      <div>
+        <div className="flex items-center justify-center gap-3">
           <div className="grid grid-flow-col gap-2">
-            <CurrencyLogo currency={quoteToken} size={48} />
+            <CurrencyLogo currency={quoteToken} size={36} />
           </div>
+          <div className="text-lg font-bold md:text-xl text-high-emphesis">{bond?.displayName}</div>
         </div>
-        <div className="text-lg font-medium md:text-2xl text-high-emphesis">
-          {}
-          &nbsp;{i18n._(t`Tokens`)}
-        </div>
-        <div className="pt-3 text-xs italic text-secondary">
-          {i18n._(t`The deposit rate can vary but can never be less than the initial defined rate.`)}
-        </div>
+
+        <div className="text-center text-lg font-sm md:text-lg text-primary">{i18n._(t`${bond?.duration}`)}</div>
       </div>
     )
   }
@@ -62,7 +57,7 @@ const BondListItem = ({ bond, ...rest }) => {
         hash={txHash}
         content={() => (
           <ConfirmationModalContent
-            title={i18n._(t`You will deposit`)}
+            title={''}
             onDismiss={handleDismissConfirmation}
             topContent={modalHeader}
             bottomContent={modalBottom}
