@@ -21,6 +21,7 @@ import { useBondPrice } from '../../hooks/useBondPrice'
 import { useUSDCPrice } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
 import { prettifySecondsInDays } from '../../utils/timeUtil'
+import { V2BondDetails, v2BondDetails, UnknownDetails } from '../../helpers/v2BondDetails'
 
 const ZERO = JSBI.BigInt(0)
 
@@ -28,16 +29,16 @@ const BASE_TOKEN_DECIMALS = 9
 
 export interface IBondV2 extends IBondV2Core, IBondV2Meta, IBondV2Terms {
   index: number
-  // displayName: string;
-  // priceUSD: number;
+  displayName: string
+  priceUSD: number
   priceToken: number
   priceTokenBigNumber: BigNumber
-  // discount: number;
+  discount: number
   duration: string
   expiration: string
-  // isLP: boolean;
-  // lpUrl: string;
-  // marketPrice: number;
+  isLP: boolean
+  lpUrl: string
+  marketPrice: number
   soldOut: boolean
   capacityInBaseToken: string
   capacityInQuoteToken: string
@@ -46,6 +47,7 @@ export interface IBondV2 extends IBondV2Core, IBondV2Meta, IBondV2Terms {
   maxPayoutOrCapacityInQuote: string
   maxPayoutOrCapacityInBase: string
   // bondIconSvg: OHMTokenStackProps["tokens"];
+  underlyinAsset: Currency
 }
 
 export interface IBondV2Balance {
@@ -97,13 +99,6 @@ export interface IUserNote {
   quoteToken: string
   // bondIconSvg: OHMTokenStackProps["tokens"];
   index: number
-}
-
-export interface V2BondDetails {
-  name: string
-  pricingFunction(provider: ethers.providers.JsonRpcProvider, quoteToken: string): Promise<number>
-  isLP: boolean
-  lpUrl: { [key: number]: string }
 }
 
 export function useBondingState(): AppState['bonding'] {
@@ -195,80 +190,37 @@ export function getBondDuration(terms: IBondV2Terms): string {
   return prettifySecondsInDays(secondsRemaining)
 }
 
-export function useProcessBond(bond: IBondV2Core, metadata: IBondV2Meta, terms: IBondV2Terms, index: number): IBondV2 {
-  // const v2BondDetail: V2BondDetails = v2BondDetails[networkID][bond.quoteToken.toLowerCase()];
-  const quoteToken = useCurrency(bond?.quoteToken?.toLocaleLowerCase())
-
-  const quoteTokenPrice = useUSDCPrice(quoteToken)
-
-  const bondPriceBigNumber = useBondPrice(index)
-  const bondPrice = +bondPriceBigNumber / Math.pow(10, BASE_TOKEN_DECIMALS)
-  // const bondPriceUSD = quoteTokenPrice * +bondPrice;
-
-  const { capacityInBaseToken, capacityInQuoteToken } = getBondCapacities(
-    bond,
-    metadata.quoteDecimals,
-    bondPriceBigNumber
-  )
-  const maxPayoutInBaseToken: string = ethers.utils.formatUnits(bond.maxPayout, BASE_TOKEN_DECIMALS)
-  const maxPayoutInQuoteToken: string = ethers.utils.formatUnits(
-    convertAmountInBondUnitToQuoteTokenUnit(bond.maxPayout, bondPriceBigNumber, metadata.quoteDecimals),
-    metadata.quoteDecimals
-  )
-  const duration = getBondDuration(terms)
-
-  const soldOut = +capacityInBaseToken < 1 || +maxPayoutInBaseToken < 1
-
-  const maxPayoutOrCapacityInQuote =
-    +capacityInQuoteToken > +maxPayoutInQuoteToken ? maxPayoutInQuoteToken : capacityInQuoteToken
-  const maxPayoutOrCapacityInBase =
-    +capacityInBaseToken > +maxPayoutInBaseToken ? maxPayoutInBaseToken : capacityInBaseToken
-  return {
-    ...bond,
-    ...metadata,
-    ...terms,
-    index: index,
-    // displayName: `${v2BondDetail.name}`,
-    // priceUSD: bondPriceUSD,
-    priceToken: bondPrice,
-    priceTokenBigNumber: bondPriceBigNumber,
-    // discount: bondDiscount,
-    expiration: new Date(terms.vesting * 1000).toDateString(),
-    duration,
-    // isLP: v2BondDetail.isLP,
-    // lpUrl: v2BondDetail.isLP ? v2BondDetail.lpUrl[networkID] : "",
-    // marketPrice: ohmPrice,
-    quoteToken: bond.quoteToken.toLowerCase(),
-    maxPayoutInQuoteToken,
-    maxPayoutInBaseToken,
-    capacityInQuoteToken,
-    capacityInBaseToken,
-    soldOut,
-    maxPayoutOrCapacityInQuote,
-    maxPayoutOrCapacityInBase,
-    // bondIconSvg: v2BondDetail.bondIconSvg,
-  }
-}
 export function useDerivedBondInfo(): {
   liveBonds?: IBondV2[]
   error?: string
 } {
   const { i18n } = useLingui()
-  const { account } = useActiveWeb3React()
 
   useBondingState()
   let error: string | undefined
   // pair
-  const liveBondIndexes = useLiveMarkets()
+  const liveBondIndexes: BigNumber[] = useLiveMarkets()
 
   const {
     bond: liveBondPromises,
     bondMetadata: liveBondMetadataPromises,
     bondTerms: liveBondTermsPromises,
-  } = useMarketsData(liveBondIndexes)
+  } = useMarketsData()
 
   const liveBonds: IBondV2[] = []
-  // console.log(liveBondPromises?.[0])
+  // console.log(liveBondPromises?.[0]?.[0]?.quoteToken)
+  /*
+  let v2BondDetail: V2BondDetails = v2BondDetails[chainId][liveBondPromises?.[0]?.[1]?.quoteToken?.toLocaleLowerCase()];
+  // console.log(v2BondDetail)
+  if (!v2BondDetail) {
+    v2BondDetail = UnknownDetails;
+    console.error(`Add details for bond index=${1}`);
+  }
+  
+  const quoteTokenPrice = v2BondDetail.pricingFunction(liveBondPromises?.[0]?.[0]?.quoteToken?.toLocaleLowerCase());
+  console.log(quoteTokenPrice)
+  */
+
   for (let i = 0; i < liveBondIndexes?.length; i++) {
     const bondIndex = +liveBondIndexes?.[i]
     try {

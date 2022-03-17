@@ -340,7 +340,7 @@ export function useProtocolDataWithRpc(): PoolDataContextData {
   // console.log(rawUserReserveData);
 
   const formattedUserReserves = rawUserReserveData?.map((rawUserReserve) => {
-    const reserve = formattedReservesData.find((resp) => resp.project === rawUserReserve.project.toLowerCase())
+    const reserve = formattedReservesData?.find((resp) => resp.project === rawUserReserve.project.toLowerCase())
     // console.log(reserve);
     const formattedUserReserve = formatObjectWithBNFields(rawUserReserve)
     formattedUserReserve.id = (currentAccount + reserve?.id).toLowerCase()

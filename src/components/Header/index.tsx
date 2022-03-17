@@ -53,6 +53,22 @@ function AppBar(): JSX.Element {
                           {i18n._(t`Invest`)}
                         </a>
                       </NavLink>
+                      <NavLink href="/bonds">
+                        <a
+                          id={`bond-nav-link`}
+                          className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                        >
+                          {i18n._(t`Bond`)}
+                        </a>
+                      </NavLink>
+                      <NavLink href="/stake">
+                        <a
+                          id={`stake-nav-link`}
+                          className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                        >
+                          {i18n._(t`Stake`)}
+                        </a>
+                      </NavLink>
                       <NavLink href="/dashboard">
                         <a
                           id={`dashboard-nav-link`}
@@ -318,6 +334,22 @@ function AppBar(): JSX.Element {
                     className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
                   >
                     {i18n._(t`Invest`)}
+                  </a>
+                </Link>
+                <Link href={'/bonds'}>
+                  <a
+                    id={`bond-nav-link`}
+                    className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                  >
+                    {i18n._(t`Bond`)}
+                  </a>
+                </Link>
+                <Link href={'/stake'}>
+                  <a
+                    id={`stake-nav-link`}
+                    className="p-2 text-baseline text-primary hover:text-high-emphesis focus:text-high-emphesis md:p-3 whitespace-nowrap"
+                  >
+                    {i18n._(t`Stake`)}
                   </a>
                 </Link>
                 <Link href={'/dashboard'}>

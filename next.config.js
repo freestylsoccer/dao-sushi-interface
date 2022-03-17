@@ -179,6 +179,14 @@ module.exports = withBundleAnalyzer(
           source: '/dashboard',
           destination: '/dashboard',
         },
+        {
+          source: '/bonds',
+          destination: '/bonds',
+        },
+        {
+          source: '/bonds/:id',
+          destination: '/bonds/bondPurchase',
+        },
       ]
     },
     i18n: {
