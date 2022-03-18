@@ -19,10 +19,6 @@ const BondListItem = ({ bond, ...rest }) => {
 
   const [txHash, setTxHash] = useState<string>('')
 
-  async function onAdd() {
-    console.log('some')
-  }
-
   const modalHeader = () => {
     return (
       <div>
@@ -33,13 +29,13 @@ const BondListItem = ({ bond, ...rest }) => {
           <div className="text-lg font-bold md:text-xl text-high-emphesis">{bond?.displayName}</div>
         </div>
 
-        <div className="text-center text-lg font-sm md:text-lg text-primary">{i18n._(t`${bond?.duration}`)}</div>
+        <div className="text-lg text-center font-sm md:text-lg text-primary">{i18n._(t`${bond?.duration}`)}</div>
       </div>
     )
   }
 
   const modalBottom = () => {
-    return <ConfirmBondModalBottom bond={bond} onAdd={onAdd} />
+    return <ConfirmBondModalBottom bond={bond} />
   }
   const pendingText = i18n._(t`Bonding`)
   const handleDismissConfirmation = useCallback(() => {

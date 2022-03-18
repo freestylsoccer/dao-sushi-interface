@@ -24,6 +24,8 @@ import { Input as PercentInput } from '../../components/PercentInput'
 import TransactionSettings from '../../components/TransactionSettings'
 import { AdjustmentsIcon, XIcon } from '@heroicons/react/solid'
 import { useUserSlippageToleranceWithDefault } from '../../state/user/hooks'
+import { useBondDepositoryContract } from '../../hooks'
+import { TransactionResponse } from '@ethersproject/providers'
 
 const sendTx = async (txFunc: () => Promise<any>): Promise<boolean> => {
   let success = true
@@ -45,11 +47,8 @@ const StyledNumericalInput = styled(NumericalInput)`
 const buttonStyle =
   'flex justify-center items-center w-full h-14 rounded font-bold md:font-medium md:text-lg mt-5 text-sm focus:outline-none focus:ring'
 const buttonStyleEnabled = `${buttonStyle} text-high-emphesis bg-gradient-to-r from-pink-red to-light-brown hover:opacity-90`
-const buttonStyleInsufficientFunds = `${buttonStyleEnabled} opacity-60`
-const buttonStyleDisabled = `${buttonStyle} text-secondary bg-dark-700`
-const buttonStyleConnectWallet = `${buttonStyle} text-high-emphesis bg-cyan-blue hover:bg-opacity-90`
 
-export function ConfirmAddModalBottom({ bond, onAdd }: { bond: IBondV2; onAdd: () => void }) {
+export function ConfirmAddModalBottom({ bond }: { bond: IBondV2 }) {
   const INPUT_CHAR_LIMIT = 18
   const { i18n } = useLingui()
   const { account, chainId } = useActiveWeb3React()
@@ -75,6 +74,10 @@ export function ConfirmAddModalBottom({ bond, onAdd }: { bond: IBondV2; onAdd: (
   const [pendingTx, setPendingTx] = useState(false)
 
   const buttonDisabled = !input || pendingTx || (parsedAmount && parsedAmount.equalTo(BIG_INT_ZERO))
+
+  const slippage = new Percent(50, 10_000)
+
+  const userSplippage = useUserSlippageToleranceWithDefault(slippage)
 
   const handleInput = (v: string) => {
     if (v.length <= INPUT_CHAR_LIMIT) {
@@ -115,11 +118,27 @@ export function ConfirmAddModalBottom({ bond, onAdd }: { bond: IBondV2; onAdd: (
     }
   }
 
+  const bondDepositoryContract = useBondDepositoryContract()
+
+  async function onBond() {
+    if (!chainId || !account || !bondDepositoryContract) return
+
+    if (!parsedAmount || !userSplippage) {
+      return
+    }
+    let estimate,
+      method: (...args: any) => Promise<TransactionResponse>,
+      args: Array<string | string[] | number>,
+      value: BigNumber | null
+    estimate = bondDepositoryContract.estimateGas.deposit
+    method = bondDepositoryContract.deposit
+    args = [parsedAmount]
+    value = null
+    console.log(userSplippage)
+  }
+
   const [recipientAddress, setRecipientAddress] = useState(account)
   const [displaySettings, setDisplaySettings] = useState(false)
-
-  const slippage = new Percent(50, 10_000)
-  const userSplippage = useUserSlippageToleranceWithDefault(slippage)
 
   return (
     <div className="p-6 mt-0 -m-6 rounded bg-dark-800">
@@ -181,27 +200,11 @@ export function ConfirmAddModalBottom({ bond, onAdd }: { bond: IBondV2; onAdd: (
           </div>
         </div>
         {approvalState === ApprovalState.NOT_APPROVED || approvalState === ApprovalState.PENDING ? (
-          <Button
-            className={`${buttonStyle} text-high-emphesis bg-cyan-blue hover:bg-opacity-90`}
-            disabled={approvalState === ApprovalState.PENDING}
-            onClick={approve}
-          >
+          <Button color="gradient" disabled={approvalState === ApprovalState.PENDING} onClick={approve}>
             {approvalState === ApprovalState.PENDING ? <Dots>{i18n._(t`Approving`)} </Dots> : i18n._(t`Approve`)}
           </Button>
         ) : (
-          <button
-            className={
-              buttonDisabled
-                ? buttonStyleDisabled
-                : !walletConnected
-                ? buttonStyleConnectWallet
-                : insufficientFunds
-                ? buttonStyleInsufficientFunds
-                : buttonStyleEnabled
-            }
-            onClick={handleClickButton}
-            disabled={buttonDisabled || inputError}
-          >
+          <Button color="gradient" onClick={onBond} disabled={buttonDisabled || inputError}>
             {!walletConnected
               ? i18n._(t`Connect Wallet`)
               : !input
@@ -209,7 +212,7 @@ export function ConfirmAddModalBottom({ bond, onAdd }: { bond: IBondV2; onAdd: (
               : insufficientFunds
               ? i18n._(t`Insufficient Balance`)
               : i18n._(t`Confirm`)}
-          </button>
+          </Button>
         )}
         <div className="flex items-center justify-between pt-2">
           <div className="text-lg text-high-emphesis">{i18n._(t`Settings`)}</div>
@@ -237,7 +240,7 @@ export function ConfirmAddModalBottom({ bond, onAdd }: { bond: IBondV2; onAdd: (
             <div className="flex items-center justify-between">
               <input
                 type="text"
-                className="w-full h-10 px-2 mt-2 rounded bg-dark-800 border-2 border-dark-700 text-sm lx:text-lg text-primary"
+                className="w-full h-10 px-2 mt-2 text-sm border-2 rounded bg-dark-800 border-dark-700 lx:text-lg text-primary"
                 value={recipientAddress}
                 onChange={(e) => setRecipientAddress(e.target.value)}
                 maxLength={42}
